@@ -71,7 +71,7 @@ public class Iniziatilize {
 		FakeDb.buildingId++;
 		
 		// init network
-		FakeDb.networkTable.put(FakeDb.networkId, new Detection(FakeDb.networkId, 45.7909, 12.3631, "network", "yellow", "Descrizione danni"));
+		FakeDb.networkTable.put(FakeDb.networkId, new Detection(FakeDb.networkId, 45.675962, 12.247593, "network", "yellow", "Descrizione danni"));
 		FakeDb.networkId++;
 		FakeDb.networkTable.put(FakeDb.networkId, new Detection(FakeDb.networkId, 45.5200, 12.3556, "network", "red", "Descrizione danni"));
 		FakeDb.networkId++;
