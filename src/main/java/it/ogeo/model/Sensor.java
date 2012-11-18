@@ -9,28 +9,27 @@ import java.io.Serializable;
  * @author micheleorsi
  *
  */
-public class Maintainable extends AbstractClass implements Serializable{
-	
+public class Sensor extends AbstractClass implements Serializable {
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
 	String type = null;
-	String status = null;
+	String value = null;
 	
 	/**
 	 * @param id
 	 * @param latitude
 	 * @param longitude
 	 * @param type
-	 * @param status
+	 * @param value
 	 */
-	public Maintainable(Integer id, Double latitude, Double longitude,
-			String type, String status) {
+	public Sensor(Integer id, Double latitude, Double longitude, String type,
+			String value) {
 		super(id, latitude, longitude);
 		this.type = type;
-		this.status = status;
+		this.value = value;
 	}
 	
 	/**
@@ -39,23 +38,26 @@ public class Maintainable extends AbstractClass implements Serializable{
 	public String getType() {
 		return type;
 	}
+
 	/**
 	 * @param type the type to set
 	 */
 	public void setType(String type) {
 		this.type = type;
 	}
+
 	/**
-	 * @return the status
+	 * @return the value
 	 */
-	public String getStatus() {
-		return status;
+	public String getValue() {
+		return value;
 	}
+
 	/**
-	 * @param status the status to set
+	 * @param value the value to set
 	 */
-	public void setStatus(String status) {
-		this.status = status;
+	public void setValue(String value) {
+		this.value = value;
 	}
 	
 }
