@@ -46,7 +46,6 @@
 		$(document).bind('pageinit', function() {
 			gm = $('#gmap');
 			initiate_geolocation();
-			initiateCharts();
 			$('#askForHosting').submit(function() {
 				// Get the vars
 				var name = $("input#askName").val();
@@ -107,18 +106,7 @@
 	                type: 'spline',
 	                marginRight: 10,
 	                events: {
-	                    load: function() {
-	                        // set up the updating of the chart each second
-	                        var series = this.series[0];
-	                        setInterval(function() {
-	                        	$.getJSON( '/rest/units/tables/accelerometro/0/last.json', function(data) {
-	                        		var x = (new Date()).getTime(); // current time
-	                                var v = data.status.split(",");
-	                                var y = parseInt(v[0], 10) + parseInt(v[1], 10) + parseInt(v[2], 10);
-	                            	series.addPoint([x, y], true, true);
-								});	                            
-	                        }, 1000);
-	                    }
+	                    load: loadFunction
 	                }
 	            },
 	            title: {
@@ -343,9 +331,44 @@
 			gm.gmap('addMarker', myMarker);
 		}
 
-		function seismograph() {
-			
+		function clearGraph() {
+			$('#sensorGraph').empty();
 		}
+		function seismograph() {
+			clearGraph();
+
+			initiateCharts(function() {
+	                        // set up the updating of the chart each second
+	                        var series = this.series[0];
+	                        setInterval(function() {
+	                        	$.getJSON( '/rest/units/tables/accelerometro/0/last.json', function(data) {
+	                        		var x = (new Date()).getTime(); // current time
+	                                var v = data.status.split(",");
+	                                var y = parseInt(v[0], 10) + parseInt(v[1], 10) + parseInt(v[2], 10);
+	                            	series.addPoint([x, y], true, true);
+								});	                            
+	                        }, 1000);
+	                    });
+		}
+
+		function humidity() {
+			clearGraph();
+
+			initiateCharts(function() {
+	                        // set up the updating of the chart each second
+	                        var series = this.series[0];
+	                        setInterval(function() {
+	                        	$.getJSON( '/rest/units/tables/umidita/0/last.json', function(data) {
+	                        		var x = (new Date()).getTime(); // current time
+	                                var y = parseInt(data.status, 10);
+	                            	series.addPoint([x, y], true, true);
+								});	                            
+	                        }, 1000);
+	                    });
+		}
+		function temperature() {}
+		function gas() {}
+		function current() {}
 
 	</script>
 	
@@ -404,8 +427,11 @@
 
 			<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="f">
 				<li data-role="list-divider">My ogeo device</li>
-				<li><a href="#" onclick="showGraphs(),seismograph()">Seismograph</a></li>
-				<li><a href="#">Gas sensor</a></li>
+				<li><a href="#" onclick="seismograph(),showGraphs()">Seismograph</a></li>
+				<li><a href="#" onclick="humidity(),showGraphs()">Humidity sensor</a></li>
+				<li><a href="#" onclick="temperature(),showGraphs()">Temperature sensor</a></li>
+				<li><a href="#" onclick="gas(),showGraphs()">Gas sensor</a></li>
+				<li><a href="#" onclick="current(),showGraphs()">Current sensor</a></li>
 			</ul>
 
 		</div><!--/content-primary-->
