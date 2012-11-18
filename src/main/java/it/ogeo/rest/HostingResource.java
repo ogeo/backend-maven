@@ -6,9 +6,7 @@ package it.ogeo.rest;
 import it.ogeo.model.Person;
 import it.ogeo.persistence.FakeDb;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -45,11 +43,12 @@ public class HostingResource {
 			@FormParam("longitude") Double longitude,
 			@FormParam("name") String name) {
 		log.info("ask person host");
-//		person.setId(FakeDb.personId);
-//		FakeDb.peopleTable.put(FakeDb.personId, person);
-//		FakeDb.peopleNeedHostingTable.put(FakeDb.personId, person);
-//		FakeDb.personId++;
-		return "you just requested the hosting of a person called "+name;
+		Person person = new Person(0, latitude, longitude, name, email, cellNumber);
+		person.setId(FakeDb.personId);
+		FakeDb.peopleTable.put(FakeDb.personId, person);
+		FakeDb.peopleNeedHostingTable.put(FakeDb.personId, person);
+		FakeDb.personId++;
+		return "ok, now you are in queue to get a bed: "+name;
 	}
 	
 	@DELETE 
