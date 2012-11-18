@@ -40,31 +40,24 @@
 				var email = $("input#askEmail").val();
 				var tel = $("input#askTel").val();
 
-				var jsonData = '{"name": "'+name+'",'+
-								'"email": "'+email+'",'+
-								'"cellNumber": "'+tel+'",'+
-								'"id": 0,'+
-								'"latitude": '+latitude+','+
-								'"longitude": '+longitude+'}';
-
-
-				// { id: 12, name: name, email: email, cellNumber: tel, latitude: latitude, longitude: longitude});
-				console.log(jsonData);
+				var data = { id: 12, name: name, email: email, cellNumber: tel, latitude: latitude, longitude: longitude};
 				// POST the data to server
-				$.ajax({
-				  type: "POST",
-				  url: "/rest/hosting/people",
-				   data: jsonData,
-					contentType: "application/json; charset=utf-8",
-					dataType: "json"
-				}).done(function( msg ) {
-				  alert( "Data Saved: " + msg );
-				  // Hide loading
-				  $.mobile.hidePageLoadingMsg();
-				}).fail(function(jqXHR, textStatus) {
-				  alert( "Request failed: " + textStatus );
-				  // Hide loading
-				  $.mobile.hidePageLoadingMsg();
+				var request = $.ajax({
+					type: "POST",
+					url: "/rest/hosting/people",
+					data: data
+				});
+
+				request.done(function( resp ) {
+					alert( resp.msg );
+					// Hide loading
+					$.mobile.hidePageLoadingMsg();
+				});
+
+				request.fail(function(jqXHR, textStatus) {
+					alert( "Request failed: " + textStatus );
+					// Hide loading
+					$.mobile.hidePageLoadingMsg();
 				});
 
 				// Show loading

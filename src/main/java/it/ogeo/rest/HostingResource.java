@@ -48,7 +48,7 @@ public class HostingResource {
 		FakeDb.peopleTable.put(FakeDb.personId, person);
 		FakeDb.peopleNeedHostingTable.put(FakeDb.personId, person);
 		FakeDb.personId++;
-		return "ok, now you are in queue to get a bed: "+name;
+		return "{\"msg\":\"ok, now you are in queue to get a bed "+name+"\"}";
 	}
 	
 	@DELETE 
@@ -56,6 +56,6 @@ public class HostingResource {
 	public String personHosted(@PathParam("personId") int personId) {
 		log.info("removed person hosted");
 		FakeDb.peopleNeedHostingTable.remove(personId);
-		return "the person "+personId+" has now a host";
+		return "{\"msg\":\"the person "+personId+" has now a host\"}";
 	}
 }
