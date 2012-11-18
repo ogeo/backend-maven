@@ -28,7 +28,7 @@ public class Iniziatilize {
 		log.info("start init environment");
 		StringBuilder builder = new StringBuilder();
 		// crea una persona
-		FakeDb.peopleTable.put(FakeDb.personId, new Person(FakeDb.personId, 45.565055, 12.427533, "Marco Bellini", "marco@bellini.it", "3381234567"));
+		FakeDb.peopleTable.put(FakeDb.personId, new Person(FakeDb.personId, 45.565055, 12.427533, "Michele", "marco@bellini.it", "3381379567"));
 		builder.append("created person "+FakeDb.peopleTable.get(FakeDb.personId)+"<br/>");
 		// crea un device associata alla persona
 		FakeDb.deviceTab.put(FakeDb.deviceId, new Device(FakeDb.deviceId, 45.565055, 12.427533, FakeDb.personId));
@@ -37,14 +37,30 @@ public class Iniziatilize {
 		FakeDb.deviceId++;
 
 		// crea una persona
-		FakeDb.peopleTable.put(FakeDb.personId, new Person(FakeDb.personId, 45.665055, 12.927533, "Marco Bellini", "marco@bellini.it", "3381234567"));
+		FakeDb.peopleTable.put(FakeDb.personId, new Person(FakeDb.personId, 45.665055, 12.927533, "Michele", "marco@bellini.it", "3381379567"));
 		builder.append("created person "+FakeDb.peopleTable.get(FakeDb.personId)+"<br/>");
 		// crea un device associata alla persona
 		FakeDb.deviceTab.put(FakeDb.deviceId, new Device(FakeDb.deviceId, 45.665055, 12.927533, FakeDb.personId));
 		builder.append("created device "+FakeDb.deviceTab.get(FakeDb.deviceId)+"<br/>");
 		FakeDb.personId++;
 		FakeDb.deviceId++;
-
+		// crea una persona
+		FakeDb.peopleTable.put(FakeDb.personId, new Person(FakeDb.personId,
+				45.95055, 12.027533, "Marco", "marco@test.it",
+				"3381379567"));
+		builder.append("created person "
+				+ FakeDb.peopleTable.get(FakeDb.personId) + "<br/>");
+		// crea un device associata alla persona
+		FakeDb.deviceTab.put(FakeDb.deviceId, new Device(FakeDb.deviceId,
+				45.665055, 12.927533, FakeDb.personId));
+		builder.append("created device "
+				+ FakeDb.deviceTab.get(FakeDb.deviceId) + "<br/>");
+		FakeDb.personId++;
+		FakeDb.deviceId++;
+		
+		FakeDb.peopleNeedHostingTable.put(FakeDb.personId, new Person(FakeDb.personId, 45.665055, 12.927533, "test", "test@test.com", "123467"));
+		FakeDb.personId++;
+		
 		for(int i=0;i<10;i++) {
 			FakeDb.accelerometroTable.put(FakeDb.accelerometroId, new Maintainable(FakeDb.accelerometroId, 45.665055, 12.927533, "accelerometro", (1+i)+","+(2+i)+","+(3+i), new Date(),FakeDb.deviceId));
 			FakeDb.accelerometroId++;

@@ -8,6 +8,12 @@
 	<name>backend-maven Maven Webapp</name>
 	<url>http://maven.apache.org</url>
 	<dependencies>
+	
+	<dependency>
+		<groupId>org.apache.httpcomponents</groupId>
+		<artifactId>httpclient</artifactId>
+		<version>4.1.1</version>
+	</dependency>
 
 		<!-- JAVA WS REST -->
 		<dependency>
