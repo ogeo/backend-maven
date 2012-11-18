@@ -38,13 +38,18 @@ public class HostingResource {
 	@POST
 	public String askPersonHost(Person person) {
 		log.info("ask person host");
+		person.setId(FakeDb.personId);
+		FakeDb.peopleTable.put(FakeDb.personId, person);
+		FakeDb.peopleNeedHostingTable.put(FakeDb.personId, person);
+		FakeDb.personId++;
 		return "you just requested the hosting of a person called "+person.getName();
 	}
 	
 	@DELETE 
 	@Path("/{personId}")
-	public String personHosted(@PathParam("personId") String personId) {
-		log.info("person hosted");
+	public String personHosted(@PathParam("personId") int personId) {
+		log.info("removed person hosted");
+		FakeDb.peopleNeedHostingTable.remove(personId);
 		return "the person "+personId+" has now a host";
 	}
 }

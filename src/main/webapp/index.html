@@ -1,7 +1,202 @@
-<h1>Hi man</h1>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>jQuery Mobile: Demos and Documentation</title>
+	<link rel="stylesheet"  href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+	<link rel="stylesheet" href="jqm-docs.css" />
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+	<script src="jqm-docs.js"></script>
+	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+	<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAIBdEo66QYkdkD0Pgbob70Jxelq2scm88&sensor=false"> </script>
+	<script src="libs/jquery.ui.map.full.min.js" type="text/javascript"></script>
 
-<a href="/rest/init">Init DB</a><br/>
 
-<a href="/rest/units/0?accelerometrox=12&accelerometroy=13&accelerometroz=14&umidita=4&temperatura=12&gas=3&corrente=2">arduino unit test</a><br/>
-<a href="/rest/hosting/people">people test</a><br/>
-<a href="/rest/map">map list</a><br/>
+	<script type="text/javascript">
+		var gm = null;
+		var latitude = 0;
+		var longitude = 0;
+
+		$(document).bind('pageinit', function() {
+			initiate_geolocation();
+			$('#askForHosting').submit(function() {
+				// Get the vars
+				var name = $("input#askName").val();
+				var email = $("input#askEmail").val();
+				var tel = $("input#askTel").val();
+
+				// POST the data to server
+				$.ajax({
+				  type: "POST",
+				  url: "/rest/hosting/people",
+				  data: { name: name, email: email, cellNumber: tel, latitude: latitude, longitude: longitude}
+				}).done(function( msg ) {
+				  alert( "Data Saved: " + msg );
+				  // Hide loading
+				  $.mobile.hidePageLoadingMsg();
+				}).fail(function(jqXHR, textStatus) {
+				  alert( "Request failed: " + textStatus );
+				  // Hide loading
+				  $.mobile.hidePageLoadingMsg();
+				});
+
+				// Show loading
+				$.mobile.showPageLoadingMsg();	
+
+				// Close the popup
+				$( "#popupAskHosting" ).popup( "close" );
+
+				// Don't submit the form, we already submited it
+				return false;
+			});
+
+			$('#offerHosting').click(function() {
+				addMarkers();
+			});
+		});
+
+
+
+
+		function initiate_geolocation() {  
+            navigator.geolocation.getCurrentPosition(initializeMap);  
+        }  
+
+
+
+		function initializeMap(position) {
+			latitude = position.coords.latitude;
+			longitude = position.coords.longitude;
+
+            var myCenter = new google.maps.LatLng(latitude, longitude);
+            
+            var myMarker = new google.maps.Marker({
+			   position:myCenter,
+			   bounds: true,
+			   animation:google.maps.Animation.BOUNCE
+			});
+
+			var mapProp = {
+			  center: myCenter,
+			  zoom:8,
+			  mapTypeId:google.maps.MapTypeId.ROADMAP
+			};
+
+			gm = $('#gmap');
+			gm.gmap(mapProp);
+			gm.gmap('addMarker', myMarker);
+
+			// addMarkers();
+		}
+
+		function addMarkers() {
+			// Check if map loaded
+			if (gm === null) {
+				return;
+			}
+
+			$.getJSON( '/rest/hosting/people', function(data) { 
+				$.each( data, function(i, m) {
+					gm.gmap('addMarker', { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true } )
+						.click(function() {
+							gm.gmap('openInfoWindow', { 'content': getPersonInfoHtml(m)}, this);
+						});
+				});
+			});
+		}
+
+		function getPersonInfoHtml(person) {
+			return '<h3>'+person.name+'</h3>Phone: <a href="tel:'+person.cellNumber+'">'+person.cellNumber+'</a><br><button onclick="offerHostingTo(\''+person.id+'\')">Offer hosting</button>';
+		}
+
+		function offerHostingTo(personId) {
+			// DELETE the data to server
+			$.ajax({
+			  type: "DELETE",
+			  url: "/hosting/people",
+			  data: { id: personId}
+			}).done(function( msg ) {
+			  alert( "Offered hosting: " + msg );
+			  // Hide loading
+			  $.mobile.hidePageLoadingMsg();
+			}).fail(function(jqXHR, textStatus) {
+			  alert( "Request failed: " + textStatus );
+			  // Hide loading
+			  $.mobile.hidePageLoadingMsg();
+			});
+
+			
+			// Show loading
+			$.mobile.showPageLoadingMsg();	
+		}
+
+	</script>
+	
+
+</head>
+<body>
+<div data-role="page" class="type-home">
+
+
+
+
+
+
+	<div data-role="popup" id="popupAskHosting" data-overlay-theme="a" data-theme="c" style="max-width:400px;" class="ui-corner-all">
+		<form id="askForHosting">
+			<div style="padding:10px 20px;">
+			  <h3>Please provide a name, email or/and your telephone number</h3>
+	          <label for="name" class="ui-hidden-accessible">Name:</label>
+	          <input type="text" name="name" id="askName" value="" placeholder="your name" data-theme="a" />
+
+	          <label for="email" class="ui-hidden-accessible">Email:</label>
+	          <input type="email" name="email" id="askEmail" value="" placeholder="your email" data-theme="a" />
+
+	          <label for="pw" class="ui-hidden-accessible">Phone number:</label>
+	          <input type="tel" name="tel" id="askTel" value="" placeholder="your phone number" data-theme="a" />
+
+			  <button type="submit" data-theme="b">Find a place</button>
+			  <button type="cancel" data-theme="c">Cancel</button>
+			</div>
+		</form>
+	</div>
+	
+
+
+
+	<div data-role="content">
+
+
+		<div class="content-secondary">
+
+			<div id="jqm-homeheader">
+				<h1 id="jqm-logo"><img src="images/logo.png" alt="jQuery Mobile Framework" /></h1>
+				<p>Helping people in case of emergencies.</p>
+			</div>
+
+
+			<p class="intro"><strong>Welcome.</strong> In case of emergency remember to stay calm. If you need or can provide help please select the appropriate action.</p>
+
+			<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="f">
+				<li data-role="list-divider">In case of emergency</li>
+
+				<li><a href="#popupAskHosting" data-rel="popup">I need a place to stay</a></li>
+				<!-- <li><a href="docs/about/intro.html">I need a place to stay</a></li> -->
+				<li><a href="#" id="offerHosting">I can host</a></li>
+			</ul>
+
+		</div><!--/content-primary-->
+
+		<div class="content-primary">
+			<div id="gmap" style="width:500px;height:380px;"></div>
+		</div>
+	</div>
+
+	<div data-role="footer" class="footer-docs" data-theme="c">
+			<p>&copy; ogeo team. Codemotion 2012</p>
+	</div>
+
+</div>
+</body>
+</html>
