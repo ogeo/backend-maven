@@ -258,7 +258,7 @@
 				});
 			});
 
-			$.getJSON( '/rest/review/network.json', function(building) { 
+			$.getJSON( '/rest/reviews/network.json', function(building) { 
 				$.each( building, function(i, m) {
 					var opts = { tags:'shuff', position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/linedown-'+m.value+'.png' };
 					gm.gmap('addMarker', opts).click(function() {
