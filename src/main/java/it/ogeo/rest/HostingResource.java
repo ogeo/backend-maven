@@ -11,7 +11,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -36,13 +38,18 @@ public class HostingResource {
 	}
 
 	@POST
-	public String askPersonHost(Person person) {
+	@Consumes({ "application/x-www-form-urlencoded; charset=utf-8" })
+	public String askPersonHost(@FormParam("cellNumber") String cellNumber,
+			@FormParam("email") String email,
+			@FormParam("latitude") Double latitude,
+			@FormParam("longitude") Double longitude,
+			@FormParam("name") String name) {
 		log.info("ask person host");
-		person.setId(FakeDb.personId);
-		FakeDb.peopleTable.put(FakeDb.personId, person);
-		FakeDb.peopleNeedHostingTable.put(FakeDb.personId, person);
-		FakeDb.personId++;
-		return "you just requested the hosting of a person called "+person.getName();
+//		person.setId(FakeDb.personId);
+//		FakeDb.peopleTable.put(FakeDb.personId, person);
+//		FakeDb.peopleNeedHostingTable.put(FakeDb.personId, person);
+//		FakeDb.personId++;
+		return "you just requested the hosting of a person called "+name;
 	}
 	
 	@DELETE 
