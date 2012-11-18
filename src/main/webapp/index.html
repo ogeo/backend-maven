@@ -224,7 +224,7 @@
 				return;
 			}
 
-			$.getJSON( '/rest/hosting/people', function(data) { 
+			$.getJSON( '/rest/hosting/people.json', function(data) { 
 				$.each( data, function(i, m) {
 					var opts = { tags:'people', position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/family.png' };
 					gm.gmap('addMarker', opts).click(function() {
@@ -240,7 +240,7 @@
 				return;
 			}
 
-			$.getJSON( '/rest/review/building', function(building) { 
+			$.getJSON( '/rest/review/building.json', function(building) { 
 				$.each( building, function(i, m) {
 					var opts = { tags:'shuff', position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/earthquake-'+m.value+'.png' };
 					gm.gmap('addMarker', opts).click(function() {
@@ -249,7 +249,7 @@
 				});
 			});
 
-			$.getJSON( '/rest/review/street', function(building) { 
+			$.getJSON( '/rest/review/street.json', function(building) { 
 				$.each( building, function(i, m) {
 					var opts = { tags:'shuff', position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/street-block-'+m.value+'.png' };
 					gm.gmap('addMarker', opts).click(function() {
@@ -258,7 +258,7 @@
 				});
 			});
 
-			$.getJSON( '/rest/review/network', function(building) { 
+			$.getJSON( '/rest/review/network.json', function(building) { 
 				$.each( building, function(i, m) {
 					var opts = { tags:'shuff', position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/linedown-'+m.value+'.png' };
 					gm.gmap('addMarker', opts).click(function() {
