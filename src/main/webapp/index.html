@@ -231,7 +231,7 @@
 				});
 			});
 
-			$.getJSON( '/rest/review/building.json', function(building) { 
+			$.getJSON( '/rest/reviews/building.json', function(building) { 
 				$.each( building, function(i, m) {
 					console.log(m);
 					var opts = { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/earthquake-'+m.value+'.png' };
@@ -241,7 +241,7 @@
 				});
 			});
 
-			$.getJSON( '/rest/review/street.json', function(building) { 
+			$.getJSON( '/rest/reviews/street.json', function(building) { 
 				$.each( building, function(i, m) {
 					var opts = { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/street-block-'+m.value+'.png' };
 					gm.gmap('addMarker', opts).click(function() {
