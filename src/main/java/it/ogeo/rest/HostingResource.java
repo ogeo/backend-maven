@@ -51,7 +51,7 @@ public class HostingResource {
 		return "{\"msg\":\"ok, now you are in queue to get a bed "+name+"\"}";
 	}
 	
-	@DELETE 
+	@POST 
 	@Path("/{personId}")
 	public String personHosted(@PathParam("personId") int personId) {
 		log.info("removed person hosted");

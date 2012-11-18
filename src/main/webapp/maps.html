@@ -50,6 +50,7 @@
 			addMarkers();
 		}
 
+
 		function addMarkers() {
 			// Check if map loaded
 			if (gm === null) {
@@ -58,16 +59,38 @@
 
 			$.getJSON( '/rest/hosting/people.json', function(data) { 
 				$.each( data, function(i, m) {
-					gm.gmap('addMarker', { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true } )
-						.click(function() {
-							gm.gmap('openInfoWindow', { 'content': getPersonInfoHtml(m)}, this);
-						});
+					var opts = { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/family.png' };
+					gm.gmap('addMarker', opts).click(function() {
+						gm.gmap('openInfoWindow', { 'content': getPersonInfoHtml(m)}, this);
+					});
+				});
+			});
+
+			$.getJSON( '/rest/review/building.json', function(building) { 
+				$.each( building, function(i, m) {
+					var opts = { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/earthquake-'+m.value+'.png' };
+					gm.gmap('addMarker', opts).click(function() {
+						gm.gmap('openInfoWindow', { 'content': getBuildingInfoHtml(m)}, this);
+					});
+				});
+			});
+
+			$.getJSON( '/rest/review/street.json', function(building) { 
+				$.each( building, function(i, m) {
+					var opts = { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/street-block-'+m.value+'.png' };
+					gm.gmap('addMarker', opts).click(function() {
+						gm.gmap('openInfoWindow', { 'content': getBuildingInfoHtml(m)}, this);
+					});
 				});
 			});
 		}
 
 		function getPersonInfoHtml(person) {
 			return '<h3>'+person.name+'</h3>Phone: <a href="tel:'+person.cellNumber+'">'+person.cellNumber+'</a>';
+		}
+
+		function getBuildingInfoHtml(building) {
+			return '<h3>'+building.description+'</h3>';
 		}
 	</script>
 

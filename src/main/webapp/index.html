@@ -11,10 +11,14 @@
 	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
 	<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAIBdEo66QYkdkD0Pgbob70Jxelq2scm88&sensor=false"> </script>
 	<script src="libs/jquery.ui.map.full.min.js" type="text/javascript"></script>
+	<script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>
+	
 
 
 	<script type="text/javascript">
 		var gm = null;
+		var lastMapZoom = 10;
+		var seismograph = null;
 		var latitude = 0;
 		var longitude = 0;
 
@@ -31,16 +35,25 @@
 		  return (typeof str !== "undefined" && str != null && str != "");
 		}
 
+		function resizeMap() {
+			var w = parseInt($('.content-primary').css('width'), 10);
+			var h = parseInt($('.content-secondary').css('height'), 10);
+			gm.css('width', w);
+			gm.css('height', h);
+			
+		}
 
 		$(document).bind('pageinit', function() {
+			gm = $('#gmap');
 			initiate_geolocation();
+			initiateCharts();
 			$('#askForHosting').submit(function() {
 				// Get the vars
 				var name = $("input#askName").val();
 				var email = $("input#askEmail").val();
 				var tel = $("input#askTel").val();
 
-				var data = { id: 12, name: name, email: email, cellNumber: tel, latitude: latitude, longitude: longitude};
+				var data = { id: 0, name: name, email: email, cellNumber: tel, latitude: latitude, longitude: longitude};
 				// POST the data to server
 				var request = $.ajax({
 					type: "POST",
@@ -73,9 +86,88 @@
 			$('#offerHosting').click(function() {
 				addMarkers();
 			});
+
+			$(window).resize(resizeMap);
 		});
 
 
+		function initiateCharts() {
+			$('#seismograph').hide();
+
+			Highcharts.setOptions({
+	            global: {
+	                useUTC: false
+	            }
+	        });
+	    
+	        
+	        seismograph = new Highcharts.Chart({
+	            chart: {
+	                renderTo: 'seismograph',
+	                type: 'spline',
+	                marginRight: 10,
+	                events: {
+	                    load: function() {
+	    
+	                        // set up the updating of the chart each second
+	                        var series = this.series[0];
+	                        setInterval(function() {
+	                            var x = (new Date()).getTime(), // current time
+	                                y = Math.random();
+	                            series.addPoint([x, y], true, true);
+	                        }, 1000);
+	                    }
+	                }
+	            },
+	            title: {
+	                text: 'Live random data'
+	            },
+	            xAxis: {
+	                type: 'datetime',
+	                tickPixelInterval: 150
+	            },
+	            yAxis: {
+	                title: {
+	                    text: 'Value'
+	                },
+	                plotLines: [{
+	                    value: 0,
+	                    width: 1,
+	                    color: '#808080'
+	                }]
+	            },
+	            tooltip: {
+	                formatter: function() {
+	                        return '<b>'+ this.series.name +'</b><br/>'+
+	                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+	                        Highcharts.numberFormat(this.y, 2);
+	                }
+	            },
+	            legend: {
+	                enabled: false
+	            },
+	            exporting: {
+	                enabled: false
+	            },
+	            series: [{
+	                name: 'Random data',
+	                data: (function() {
+	                    // generate an array of random data
+	                    var data = [],
+	                        time = (new Date()).getTime(),
+	                        i;
+	    
+	                    for (i = -19; i <= 0; i++) {
+	                        data.push({
+	                            x: time + i * 1000,
+	                            y: Math.random()
+	                        });
+	                    }
+	                    return data;
+	                })()
+	            }]
+	        });
+		}
 
 
 		function initiate_geolocation() {  
@@ -87,12 +179,19 @@
 		function initializeMap(position) {
 			if (_notEmpty(location.queryString.latitude)) {
 				latitude = location.queryString.latitude;
-				longitude = location.queryString.latitude;
+				longitude = location.queryString.longitude;
+			}
+			else if (_notEmpty(location.queryString.fuzzy)) {
+				latitude = position.coords.latitude + Math.random() * 0.1;
+				longitude = position.coords.longitude + Math.random() * 0.1;
 			}
 			else {
 				latitude = position.coords.latitude;
 				longitude = position.coords.longitude;
 			}
+
+			console.log(latitude);
+			console.log(longitude);
 
             var myCenter = new google.maps.LatLng(latitude, longitude);
             
@@ -104,15 +203,17 @@
 
 			var mapProp = {
 			  center: myCenter,
-			  zoom:8,
+			  zoom:lastMapZoom,
 			  mapTypeId:google.maps.MapTypeId.ROADMAP
 			};
 
-			gm = $('#gmap');
 			gm.gmap(mapProp);
 			gm.gmap('addMarker', myMarker);
 
-			// addMarkers();
+			gm.gmap().bind('init', function(event, map) { 
+				gm.gmap('option', 'zoom', lastMapZoom);
+				resizeMap();
+			});
 		}
 
 		function addMarkers() {
@@ -121,42 +222,102 @@
 				return;
 			}
 
-			$.getJSON( '/rest/hosting/people', function(data) { 
+			$.getJSON( '/rest/hosting/people.json', function(data) { 
 				$.each( data, function(i, m) {
-					gm.gmap('addMarker', { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true } )
-						.click(function() {
-							gm.gmap('openInfoWindow', { 'content': getPersonInfoHtml(m)}, this);
-						});
+					var opts = { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/family.png' };
+					gm.gmap('addMarker', opts).click(function() {
+						gm.gmap('openInfoWindow', { 'content': getPersonInfoHtml(m)}, this);
+					});
+				});
+			});
+
+			$.getJSON( '/rest/review/building.json', function(building) { 
+				$.each( building, function(i, m) {
+					console.log(m);
+					var opts = { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/earthquake-'+m.value+'.png' };
+					gm.gmap('addMarker', opts).click(function() {
+						gm.gmap('openInfoWindow', { 'content': getBuildingInfoHtml(m)}, this);
+					});
+				});
+			});
+
+			$.getJSON( '/rest/review/street.json', function(building) { 
+				$.each( building, function(i, m) {
+					var opts = { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/street-block-'+m.value+'.png' };
+					gm.gmap('addMarker', opts).click(function() {
+						gm.gmap('openInfoWindow', { 'content': getBuildingInfoHtml(m)}, this);
+					});
 				});
 			});
 		}
 
 		function getPersonInfoHtml(person) {
-			return '<h3>'+person.name+'</h3>Phone: <a href="tel:'+person.cellNumber+'">'+person.cellNumber+'</a><br><button onclick="offerHostingTo(\''+person.id+'\')">Offer hosting</button>';
+			var dist = distance(latitude, longitude, person.latitude, person.longitude);
+			return '<h3>'+person.name+'</h3>Phone: <a href="tel:'+person.cellNumber+'">'+person.cellNumber+'</a><br>Distance: '+dist+' km<br><button onclick="offerHostingTo(\''+person.id+'\')">Offer hosting</button>';
+		}
+
+		function getBuildingInfoHtml(building) {
+			return '<h3>'+building.description+'</h3>';
+		}
+
+		function distance(lat1, lon1, lat2, lon2) {
+			var radlat1 = Math.PI * lat1/180;
+			var radlat2 = Math.PI * lat2/180;
+			var radlon1 = Math.PI * lon1/180;
+			var radlon2 = Math.PI * lon2/180;
+			var theta = lon1-lon2;
+			var radtheta = Math.PI * theta/180;
+			var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+			dist = Math.acos(dist);
+			dist = dist * 180/Math.PI;
+			dist = dist * 60 * 1.1515;
+			dist = dist * 1.609344; // Km
+			return Math.round(dist * 100) / 100;
 		}
 
 		function offerHostingTo(personId) {
 			// DELETE the data to server
-			$.ajax({
-			  type: "DELETE",
-			  url: "/hosting/people",
-			  data: { id: personId}
-			}).done(function( msg ) {
-			  alert( "Offered hosting: " + msg );
-			  // Hide loading
-			  $.mobile.hidePageLoadingMsg();
-			}).fail(function(jqXHR, textStatus) {
-			  alert( "Request failed: " + textStatus );
-			  // Hide loading
-			  $.mobile.hidePageLoadingMsg();
+			var request = $.ajax({
+				type: "POST",
+				url: "/rest/hosting/people/"+personId
 			});
 
+			request.done(function( resp ) {
+				alert( resp.msg );
+				// Hide loading
+				$.mobile.hidePageLoadingMsg();
+			});
+
+			request.fail(function(jqXHR, textStatus) {
+				alert( "Request failed: " + textStatus );
+				// Hide loading
+				$.mobile.hidePageLoadingMsg();
+			});
 			
 			// Show loading
 			$.mobile.showPageLoadingMsg();	
 		}
 
+		function showGraphs() {
+			// Hide map
+			lastMapZoom = gm.gmap('option', 'zoom');
+			gm.hide('slow');
+			// Show Seismograph
+			$('#seismograph').show('slow');
+		}
 
+		function showMap() {
+			// Hide map
+			gm.show('slow', function() {
+				gm.gmap('option', 'zoom', lastMapZoom);	
+			});
+			// Show Seismograph
+			$('#seismograph').hide('slow');
+		}
+
+		function odeoSummary() {
+			
+		}
 
 	</script>
 	
@@ -208,15 +369,23 @@
 			<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="f">
 				<li data-role="list-divider">In case of emergency</li>
 
-				<li><a href="#popupAskHosting" data-rel="popup">I need a place to stay</a></li>
+				<li><a href="#popupAskHosting" onclick="showMap()" data-rel="popup">I need a place to stay</a></li>
 				<!-- <li><a href="docs/about/intro.html">I need a place to stay</a></li> -->
-				<li><a href="#" id="offerHosting">I can host</a></li>
+				<li><a href="#" onclick="showMap()" id="offerHosting">I can host</a></li>
+			</ul>
+
+			<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="f">
+				<li data-role="list-divider">My ogeo device</li>
+				<li><a href="#" onclick="showGraphs(),odeoSummary()">Summary</a></li>
+				<li><a href="#">Seismograph</a></li>
+				<li><a href="#">Gas sensor</a></li>
 			</ul>
 
 		</div><!--/content-primary-->
 
-		<div class="content-primary">
+		<div class="content-primary" style="margin-top: 30px">
 			<div id="gmap" style="width:500px;height:380px;"></div>
+			<div id="seismograph"></div>
 		</div>
 	</div>
 
