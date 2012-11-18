@@ -17,7 +17,8 @@
 
 	<script type="text/javascript">
 		var gm = null;
-		var lastMapZoom = 10;
+		var lastMapZoom = 0;
+		var myMarker = null;
 		var seismograph = null;
 		var latitude = 0;
 		var longitude = 0;
@@ -84,7 +85,7 @@
 			});
 
 			$('#offerHosting').click(function() {
-				addMarkers();
+				addPeopleMarkers();
 			});
 
 			$(window).resize(resizeMap);
@@ -195,7 +196,7 @@
 
             var myCenter = new google.maps.LatLng(latitude, longitude);
             
-            var myMarker = new google.maps.Marker({
+            myMarker = new google.maps.Marker({
 			   position:myCenter,
 			   bounds: true,
 			   animation:google.maps.Animation.BOUNCE
@@ -203,16 +204,33 @@
 
 			var mapProp = {
 			  center: myCenter,
-			  zoom:lastMapZoom,
 			  mapTypeId:google.maps.MapTypeId.ROADMAP
 			};
 
 			gm.gmap(mapProp);
 			gm.gmap('addMarker', myMarker);
+			addMarkers();
+			showStuffMarkers();
 
 			gm.gmap().bind('init', function(event, map) { 
-				gm.gmap('option', 'zoom', lastMapZoom);
+				gm.gmap('option', 'zoom', 10);
 				resizeMap();
+			});
+		}
+
+		function addPeopleMarkers() {
+			// Check if map loaded
+			if (gm === null) {
+				return;
+			}
+
+			$.getJSON( '/rest/hosting/people', function(data) { 
+				$.each( data, function(i, m) {
+					var opts = { tags:'people', position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/family.png' };
+					gm.gmap('addMarker', opts).click(function() {
+						gm.gmap('openInfoWindow', { 'content': getPersonInfoHtml(m)}, this);
+					});
+				});
 			});
 		}
 
@@ -222,28 +240,27 @@
 				return;
 			}
 
-			$.getJSON( '/rest/hosting/people.json', function(data) { 
-				$.each( data, function(i, m) {
-					var opts = { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/family.png' };
-					gm.gmap('addMarker', opts).click(function() {
-						gm.gmap('openInfoWindow', { 'content': getPersonInfoHtml(m)}, this);
-					});
-				});
-			});
-
-			$.getJSON( '/rest/review/building.json', function(building) { 
+			$.getJSON( '/rest/review/building', function(building) { 
 				$.each( building, function(i, m) {
-					console.log(m);
-					var opts = { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/earthquake-'+m.value+'.png' };
+					var opts = { tags:'shuff', position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/earthquake-'+m.value+'.png' };
 					gm.gmap('addMarker', opts).click(function() {
 						gm.gmap('openInfoWindow', { 'content': getBuildingInfoHtml(m)}, this);
 					});
 				});
 			});
 
-			$.getJSON( '/rest/review/street.json', function(building) { 
+			$.getJSON( '/rest/review/street', function(building) { 
 				$.each( building, function(i, m) {
-					var opts = { position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/street-block-'+m.value+'.png' };
+					var opts = { tags:'shuff', position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/street-block-'+m.value+'.png' };
+					gm.gmap('addMarker', opts).click(function() {
+						gm.gmap('openInfoWindow', { 'content': getBuildingInfoHtml(m)}, this);
+					});
+				});
+			});
+
+			$.getJSON( '/rest/review/network', function(building) { 
+				$.each( building, function(i, m) {
+					var opts = { tags:'shuff', position: new google.maps.LatLng(m.latitude, m.longitude), bounds:true, icon:'images/linedown-'+m.value+'.png' };
 					gm.gmap('addMarker', opts).click(function() {
 						gm.gmap('openInfoWindow', { 'content': getBuildingInfoHtml(m)}, this);
 					});
@@ -299,20 +316,36 @@
 		}
 
 		function showGraphs() {
-			// Hide map
-			lastMapZoom = gm.gmap('option', 'zoom');
-			gm.hide('slow');
-			// Show Seismograph
-			$('#seismograph').show('slow');
+			if (lastMapZoom == 0) {
+				// Hide map
+				lastMapZoom = gm.gmap('option', 'zoom');
+				gm.hide('slow');
+				// Show Seismograph
+				$('#seismograph').show('slow');
+			}
 		}
 
 		function showMap() {
-			// Hide map
-			gm.show('slow', function() {
-				gm.gmap('option', 'zoom', lastMapZoom);	
-			});
-			// Show Seismograph
-			$('#seismograph').hide('slow');
+			if (lastMapZoom != 0) {
+				// Hide map
+				gm.show('slow', function() {
+					gm.gmap('option', 'zoom', lastMapZoom);	
+				});
+				// Show Seismograph
+				$('#seismograph').hide('slow');
+			}
+		}
+
+		function showPeople() {
+			gm.gmap('clear', 'markers');
+			addPeopleMarkers();
+			gm.gmap('addMarker', myMarker);
+		}
+
+		function showDamages() {
+			gm.gmap('clear', 'markers');
+			addMarkers();	
+			gm.gmap('addMarker', myMarker);
 		}
 
 		function odeoSummary() {
@@ -369,9 +402,9 @@
 			<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="f">
 				<li data-role="list-divider">In case of emergency</li>
 
-				<li><a href="#popupAskHosting" onclick="showMap()" data-rel="popup">I need a place to stay</a></li>
+				<li><a href="#popupAskHosting" onclick="showMap(),showDamages()" data-rel="popup">I need a place to stay</a></li>
 				<!-- <li><a href="docs/about/intro.html">I need a place to stay</a></li> -->
-				<li><a href="#" onclick="showMap()" id="offerHosting">I can host</a></li>
+				<li><a href="#" onclick="showMap(),showPeople()" id="offerHosting">I can host</a></li>
 			</ul>
 
 			<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="f">
