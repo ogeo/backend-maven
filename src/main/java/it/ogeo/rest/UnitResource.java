@@ -8,6 +8,9 @@ import it.ogeo.model.Maintainable;
 import it.ogeo.persistence.FakeDb;
 
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.ws.rs.GET;
@@ -28,27 +31,19 @@ public class UnitResource {
 	private Logger log = Logger.getLogger(UnitResource.class.getName());
 	
 	@GET
-	@Path("/umidita")
-	public Collection<Maintainable> returnUmidita()  {
-		return FakeDb.umiditaTable.values();
+	@Path("/tables/{type}")
+	public Collection<Maintainable> returnTypeColl(@PathParam("type") String type)  {
+		return FakeDb.getTableFromName(type).values();
 	}
 	
 	@GET
-	@Path("/temperatura")
-	public Collection<Maintainable> returnTemperatura()  {
-		return FakeDb.temperaturaTable.values();
-	}
-	
-	@GET
-	@Path("/gas")
-	public Collection<Maintainable> returnGas()  {
-		return FakeDb.gasTable.values();
-	}
-	
-	@GET
-	@Path("/corrente")
-	public Collection<Maintainable> returnCorrente()  {
-		return FakeDb.correnteTable.values();
+	@Path("/tables/{type}/{personId}")
+	public Collection<Maintainable> returnTypeCollPerson(@PathParam("type") String type,@PathParam("personId") int personId)  {
+		Collection<Maintainable> returnColl =  new Vector<Maintainable>();
+		for (Maintainable maintainable : this.returnTypeColl(type)) {
+			if(maintainable.getType().equals(type)) returnColl.add(maintainable);
+		}
+		return returnColl;
 	}
 	
 	@GET
@@ -71,19 +66,15 @@ public class UnitResource {
 				", corrente: "+corrente);
 		
 		Device dev = FakeDb.deviceTab.get(unitId);
-		FakeDb.maintainableTable.put(FakeDb.maintainableId, new Maintainable(FakeDb.maintainableId, dev.getLatitude(), dev.getLongitude(), "accelerometrox", accelerometrox));
-		FakeDb.maintainableId++;
-		FakeDb.maintainableTable.put(FakeDb.maintainableId, new Maintainable(FakeDb.maintainableId, dev.getLatitude(), dev.getLongitude(), "accelerometroy", accelerometroy));
-		FakeDb.maintainableId++;
-		FakeDb.maintainableTable.put(FakeDb.maintainableId, new Maintainable(FakeDb.maintainableId, dev.getLatitude(), dev.getLongitude(), "accelerometroz", accelerometroz));
-		FakeDb.maintainableId++;
-		FakeDb.umiditaTable.put(FakeDb.umiditaId, new Maintainable(FakeDb.umiditaId, dev.getLatitude(), dev.getLongitude(), "umidita", accelerometroz));
+		FakeDb.accelerometroTable.put(FakeDb.accelerometroId, new Maintainable(FakeDb.accelerometroId, dev.getLatitude(), dev.getLongitude(), "accelerometro", accelerometrox+","+accelerometroy+","+accelerometroz, new Date(),unitId));
+		FakeDb.accelerometroId++;
+		FakeDb.umiditaTable.put(FakeDb.umiditaId, new Maintainable(FakeDb.umiditaId, dev.getLatitude(), dev.getLongitude(), "umidita", umidita, new Date(),unitId));
 		FakeDb.umiditaId++;
-		FakeDb.temperaturaTable.put(FakeDb.temperaturaId, new Maintainable(FakeDb.temperaturaId, dev.getLatitude(), dev.getLongitude(), "temperatura", temperatura));
+		FakeDb.temperaturaTable.put(FakeDb.temperaturaId, new Maintainable(FakeDb.temperaturaId, dev.getLatitude(), dev.getLongitude(), "temperatura", temperatura, new Date(),unitId));
 		FakeDb.temperaturaId++;
-		FakeDb.gasTable.put(FakeDb.gasId, new Maintainable(FakeDb.gasId, dev.getLatitude(), dev.getLongitude(), "gas", gas));
+		FakeDb.gasTable.put(FakeDb.gasId, new Maintainable(FakeDb.gasId, dev.getLatitude(), dev.getLongitude(), "gas", gas, new Date(),unitId));
 		FakeDb.gasId++;
-		FakeDb.correnteTable.put(FakeDb.correnteId, new Maintainable(FakeDb.correnteId, dev.getLatitude(), dev.getLongitude(), "corrente", corrente));
+		FakeDb.correnteTable.put(FakeDb.correnteId, new Maintainable(FakeDb.correnteId, dev.getLatitude(), dev.getLongitude(), "corrente", corrente, new Date(),unitId));
 		FakeDb.correnteId++;
 		
 		return "thanks for your request: "+unitId+
