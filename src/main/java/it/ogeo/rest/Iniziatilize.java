@@ -55,13 +55,36 @@ public class Iniziatilize {
 			FakeDb.correnteTable.put(FakeDb.correnteId, new Maintainable(FakeDb.correnteId, 45.665055, 12.927533, "corrente", ""+1*i, new Date(),FakeDb.deviceId));
 			FakeDb.correnteId++;
 			
-			FakeDb.buildingTable.put(FakeDb.buildingId, new Detection(FakeDb.buildingId, 45.665055+i, 12.927533+i, "building", ReviewResource.getLevel(""+i),"a description"));
-			FakeDb.buildingId++;
-			FakeDb.streetTable.put(FakeDb.streetId, new Detection(FakeDb.streetId, 45.665055+i, 12.927533+i, "street", ReviewResource.getLevel(""+i),"a description"));
-			FakeDb.streetId++;
-			FakeDb.networkTable.put(FakeDb.networkId, new Detection(FakeDb.networkId, 45.665055+i, 12.927533+i, "network", ReviewResource.getLevel(""+i),"a description"));
-			FakeDb.networkId++;
+//			FakeDb.buildingTable.put(FakeDb.buildingId, new Detection(FakeDb.buildingId, 45.665055+i, 12.927533+i, "building", ReviewResource.getLevel(""+i),"a description"));
+//			FakeDb.buildingId++;
+//			FakeDb.streetTable.put(FakeDb.streetId, new Detection(FakeDb.streetId, 45.665055+i, 12.927533+i, "street", ReviewResource.getLevel(""+i),"a description"));
+//			FakeDb.streetId++;
+//			FakeDb.networkTable.put(FakeDb.networkId, new Detection(FakeDb.networkId, 45.665055+i, 12.927533+i, "network", ReviewResource.getLevel(""+i),"a description"));
+//			FakeDb.networkId++;
 		}
+		// init building
+		FakeDb.buildingTable.put(FakeDb.buildingId, new Detection(FakeDb.buildingId, 45.7012, 12.3032, "building", "yellow", "Descrizione danni"));
+		FakeDb.buildingId++;
+		FakeDb.buildingTable.put(FakeDb.buildingId, new Detection(FakeDb.buildingId, 45.7020, 12.3041, "building", "red", "Descrizione danni"));
+		FakeDb.buildingId++;
+		FakeDb.buildingTable.put(FakeDb.buildingId, new Detection(FakeDb.buildingId, 45.7012, 12.3032, "building", "black", "Descrizione danni"));
+		FakeDb.buildingId++;
+		
+		// init network
+		FakeDb.networkTable.put(FakeDb.networkId, new Detection(FakeDb.networkId, 45.7909, 12.3631, "network", "yellow", "Descrizione danni"));
+		FakeDb.networkId++;
+		FakeDb.networkTable.put(FakeDb.networkId, new Detection(FakeDb.networkId, 45.5200, 12.3556, "network", "red", "Descrizione danni"));
+		FakeDb.networkId++;
+		FakeDb.networkTable.put(FakeDb.networkId, new Detection(FakeDb.networkId, 45.625055, 12.4886, "network", "black", "Descrizione danni"));
+		FakeDb.networkId++;
+		
+		// init street
+		FakeDb.streetTable.put(FakeDb.streetId, new Detection(FakeDb.streetId, 45.7099, 12.3641, "street", "yellow", "Descrizione danni"));
+		FakeDb.streetId++;
+		FakeDb.streetTable.put(FakeDb.streetId, new Detection(FakeDb.streetId, 45.5020, 12.3036, "street", "red", "Descrizione danni"));
+		FakeDb.streetId++;
+		FakeDb.streetTable.put(FakeDb.streetId, new Detection(FakeDb.streetId, 45.625055, 12.4116, "street", "black", "Descrizione danni"));
+		FakeDb.streetId++;
 		
 		return "environment initialized: <br/>"+builder.toString();
 	}
