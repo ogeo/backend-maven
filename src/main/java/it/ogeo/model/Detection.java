@@ -12,25 +12,30 @@ import java.io.Serializable;
 public class Detection extends AbstractClass implements Serializable {
 
 	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	String type = null;
-	String value = null;
-	
-	/**
 	 * @param id
 	 * @param latitude
 	 * @param longitude
 	 * @param type
 	 * @param value
+	 * @param description
 	 */
-	public Detection(Integer id, Double latitude, Double longitude, String type,
-			String value) {
+	public Detection(Integer id, Double latitude, Double longitude,
+			String type, String value, String description) {
 		super(id, latitude, longitude);
 		this.type = type;
 		this.value = value;
+		this.description = description;
 	}
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	String type = null;
+	String value = null;
+	String description = null;
+	
+	
 	
 	/**
 	 * @return the type
@@ -58,6 +63,20 @@ public class Detection extends AbstractClass implements Serializable {
 	 */
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 	
 }

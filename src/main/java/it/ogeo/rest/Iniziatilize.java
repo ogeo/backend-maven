@@ -3,6 +3,7 @@
  */
 package it.ogeo.rest;
 
+import it.ogeo.model.Detection;
 import it.ogeo.model.Device;
 import it.ogeo.model.Maintainable;
 import it.ogeo.model.Person;
@@ -53,6 +54,13 @@ public class Iniziatilize {
 			FakeDb.gasId++;
 			FakeDb.correnteTable.put(FakeDb.correnteId, new Maintainable(FakeDb.correnteId, 45.665055, 12.927533, "corrente", ""+1*i, new Date(),FakeDb.deviceId));
 			FakeDb.correnteId++;
+			
+			FakeDb.buildingTable.put(FakeDb.buildingId, new Detection(FakeDb.buildingId, 45.665055+i, 12.927533+i, "building", ReviewResource.getLevel(""+i),"a description"));
+			FakeDb.buildingId++;
+			FakeDb.streetTable.put(FakeDb.streetId, new Detection(FakeDb.streetId, 45.665055+i, 12.927533+i, "street", ReviewResource.getLevel(""+i),"a description"));
+			FakeDb.streetId++;
+			FakeDb.networkTable.put(FakeDb.networkId, new Detection(FakeDb.networkId, 45.665055+i, 12.927533+i, "network", ReviewResource.getLevel(""+i),"a description"));
+			FakeDb.networkId++;
 		}
 		
 		return "environment initialized: <br/>"+builder.toString();

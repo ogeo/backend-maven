@@ -9,7 +9,6 @@ import it.ogeo.persistence.FakeDb;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Logger;
 
