@@ -3,12 +3,15 @@
  */
 package it.ogeo.rest;
 
+import java.util.Collection;
 import java.util.logging.Logger;
 
 import it.ogeo.model.Detection;
 import it.ogeo.persistence.FakeDb;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -20,6 +23,7 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("/reviews")
 @Produces({ MediaType.APPLICATION_JSON+"; charset=utf-8" })
+@Consumes({ "application/x-www-form-urlencoded; charset=utf-8" })
 public class ReviewResource {
 	private Logger log = Logger.getLogger(ReviewResource.class.getName());
 	
@@ -34,6 +38,24 @@ public class ReviewResource {
 		FakeDb.buildingId++;
 		log.info("receive building reviews");
 		return "thanks for the review type building with value: "+status;
+	}
+	
+	@GET
+	@Path("/building")
+	public Collection<Detection> getBuildingReviews() {
+		return FakeDb.buildingTable.values();
+	}
+	
+	@GET
+	@Path("/street")
+	public Collection<Detection> getStreetReviews() {
+		return FakeDb.streetTable.values();
+	}
+	
+	@GET
+	@Path("/network")
+	public Collection<Detection> getNetworkReviews() {
+		return FakeDb.networkTable.values();
 	}
 	
 	@POST

@@ -77,6 +77,7 @@ public class FakeDb {
 		else if(type.equals("temperatura")) return temperaturaTable;
 		else if(type.equals("gas")) return gasTable;
 		else if(type.equals("corrente")) return correnteTable;
+		else if(type.equals("accelerometro")) return accelerometroTable;
 		else return null;
 	}
 	
