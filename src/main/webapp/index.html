@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>jQuery Mobile: Demos and Documentation</title>
+	<title>Ogeo - app for emergencies</title>
 	<link rel="stylesheet"  href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
 	<link rel="stylesheet" href="jqm-docs.css" />
 	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
@@ -17,9 +17,8 @@
 
 	<script type="text/javascript">
 		var gm = null;
-		var lastMapZoom = 0;
 		var myMarker = null;
-		var seismograph = null;
+		var sensorGraph = null;
 		var latitude = 0;
 		var longitude = 0;
 
@@ -84,16 +83,16 @@
 				return false;
 			});
 
-			$('#offerHosting').click(function() {
-				addPeopleMarkers();
-			});
+			// $('#offerHosting').click(function() {
+			// 	addPeopleMarkers();
+			// });
 
 			$(window).resize(resizeMap);
 		});
 
 
-		function initiateCharts() {
-			$('#seismograph').hide();
+		function initiateCharts(loadFunction) {
+			$('#sensorGraph').hide();
 
 			Highcharts.setOptions({
 	            global: {
@@ -102,20 +101,22 @@
 	        });
 	    
 	        
-	        seismograph = new Highcharts.Chart({
+	        sensorGraph = new Highcharts.Chart({
 	            chart: {
-	                renderTo: 'seismograph',
+	                renderTo: 'sensorGraph',
 	                type: 'spline',
 	                marginRight: 10,
 	                events: {
 	                    load: function() {
-	    
 	                        // set up the updating of the chart each second
 	                        var series = this.series[0];
 	                        setInterval(function() {
-	                            var x = (new Date()).getTime(), // current time
-	                                y = Math.random();
-	                            series.addPoint([x, y], true, true);
+	                        	$.getJSON( '/rest/units/tables/accelerometro/0/last.json', function(data) {
+	                        		var x = (new Date()).getTime(); // current time
+	                                var v = data.status.split(",");
+	                                var y = parseInt(v[0], 10) + parseInt(v[1], 10) + parseInt(v[2], 10);
+	                            	series.addPoint([x, y], true, true);
+								});	                            
 	                        }, 1000);
 	                    }
 	                }
@@ -149,7 +150,8 @@
 	            },
 	            exporting: {
 	                enabled: false
-	            },
+	            }
+	            ,
 	            series: [{
 	                name: 'Random data',
 	                data: (function() {
@@ -210,7 +212,6 @@
 			gm.gmap(mapProp);
 			gm.gmap('addMarker', myMarker);
 			addMarkers();
-			showStuffMarkers();
 
 			gm.gmap().bind('init', function(event, map) { 
 				gm.gmap('option', 'zoom', 10);
@@ -316,24 +317,18 @@
 		}
 
 		function showGraphs() {
-			if (lastMapZoom == 0) {
-				// Hide map
-				lastMapZoom = gm.gmap('option', 'zoom');
-				gm.hide('slow');
-				// Show Seismograph
-				$('#seismograph').show('slow');
-			}
+			// Hide map
+			gm.hide('slow');
+			// Show Seismograph
+			$('#sensorGraph').show('slow');
 		}
 
 		function showMap() {
-			if (lastMapZoom != 0) {
-				// Hide map
-				gm.show('slow', function() {
-					gm.gmap('option', 'zoom', lastMapZoom);	
-				});
-				// Show Seismograph
-				$('#seismograph').hide('slow');
-			}
+			// Hide map
+			gm.show('slow');
+			// Show Seismograph
+			$('#sensorGraph').hide('slow');
+			
 		}
 
 		function showPeople() {
@@ -348,7 +343,7 @@
 			gm.gmap('addMarker', myMarker);
 		}
 
-		function odeoSummary() {
+		function seismograph() {
 			
 		}
 
@@ -409,8 +404,7 @@
 
 			<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="f">
 				<li data-role="list-divider">My ogeo device</li>
-				<li><a href="#" onclick="showGraphs(),odeoSummary()">Summary</a></li>
-				<li><a href="#">Seismograph</a></li>
+				<li><a href="#" onclick="showGraphs(),seismograph()">Seismograph</a></li>
 				<li><a href="#">Gas sensor</a></li>
 			</ul>
 
@@ -418,7 +412,7 @@
 
 		<div class="content-primary" style="margin-top: 30px">
 			<div id="gmap" style="width:500px;height:380px;"></div>
-			<div id="seismograph"></div>
+			<div id="sensorGraph"></div>
 		</div>
 	</div>
 
