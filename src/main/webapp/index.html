@@ -18,6 +18,20 @@
 		var latitude = 0;
 		var longitude = 0;
 
+
+		location.queryString = {};
+		location.search.substr(1).split("&").forEach(function (pair) {
+		    if (pair === "") return;
+		    var parts = pair.split("=");
+		    location.queryString[parts[0]] = parts[1] &&
+		        decodeURIComponent(parts[1].replace(/\+/g, " "));
+		});
+
+		function _notEmpty(str) {
+		  return (typeof str !== "undefined" && str != null && str != "");
+		}
+
+
 		$(document).bind('pageinit', function() {
 			initiate_geolocation();
 			$('#askForHosting').submit(function() {
@@ -26,11 +40,23 @@
 				var email = $("input#askEmail").val();
 				var tel = $("input#askTel").val();
 
+				var jsonData = '{"name": "'+name+'",'+
+								'"email": "'+email+'",'+
+								'"cellNumber": "'+tel+'",'+
+								'"id": 0,'+
+								'"latitude": '+latitude+','+
+								'"longitude": '+longitude+'}';
+
+
+				// { id: 12, name: name, email: email, cellNumber: tel, latitude: latitude, longitude: longitude});
+				console.log(jsonData);
 				// POST the data to server
 				$.ajax({
 				  type: "POST",
 				  url: "/rest/hosting/people",
-				  data: { name: name, email: email, cellNumber: tel, latitude: latitude, longitude: longitude}
+				   data: jsonData,
+					contentType: "application/json; charset=utf-8",
+					dataType: "json"
 				}).done(function( msg ) {
 				  alert( "Data Saved: " + msg );
 				  // Hide loading
@@ -66,8 +92,14 @@
 
 
 		function initializeMap(position) {
-			latitude = position.coords.latitude;
-			longitude = position.coords.longitude;
+			if (_notEmpty(location.queryString.latitude)) {
+				latitude = location.queryString.latitude;
+				longitude = location.queryString.latitude;
+			}
+			else {
+				latitude = position.coords.latitude;
+				longitude = position.coords.longitude;
+			}
 
             var myCenter = new google.maps.LatLng(latitude, longitude);
             
@@ -130,6 +162,8 @@
 			// Show loading
 			$.mobile.showPageLoadingMsg();	
 		}
+
+
 
 	</script>
 	
