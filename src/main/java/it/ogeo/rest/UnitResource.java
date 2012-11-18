@@ -46,6 +46,16 @@ public class UnitResource {
 	}
 	
 	@GET
+	@Path("/tables/{type}/{personId}/last")
+	public Maintainable returnLastTypeCollPerson(@PathParam("type") String type,@PathParam("personId") int personId)  {
+		Collection<Maintainable> returnColl =  new Vector<Maintainable>();
+		for (Maintainable maintainable : this.returnTypeColl(type)) {
+			if(maintainable.getType().equals(type)) returnColl.add(maintainable);
+		}
+		return new Vector<Maintainable>(returnColl).get(returnColl.size()-1);
+	}
+	
+	@GET
 	@Path("/{unitId}")
 	public String receiveParametersFromDevice(@PathParam("unitId") int unitId,
 			@QueryParam("accelerometrox") String accelerometrox,
