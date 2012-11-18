@@ -28,7 +28,7 @@ public class Iniziatilize {
 		log.info("start init environment");
 		StringBuilder builder = new StringBuilder();
 		// crea una persona
-		FakeDb.peopleTable.put(FakeDb.personId, new Person(FakeDb.personId, 45.565055, 12.427533, "Marco Bellini", "marco@bellini.it", "3381234567"));
+		FakeDb.peopleTable.put(FakeDb.personId, new Person(FakeDb.personId, 45.565055, 12.427533, "Michele", "marco@bellini.it", "3381379567"));
 		builder.append("created person "+FakeDb.peopleTable.get(FakeDb.personId)+"<br/>");
 		// crea un device associata alla persona
 		FakeDb.deviceTab.put(FakeDb.deviceId, new Device(FakeDb.deviceId, 45.565055, 12.427533, FakeDb.personId));
@@ -37,7 +37,7 @@ public class Iniziatilize {
 		FakeDb.deviceId++;
 
 		// crea una persona
-		FakeDb.peopleTable.put(FakeDb.personId, new Person(FakeDb.personId, 45.665055, 12.927533, "Marco Bellini", "marco@bellini.it", "3381234567"));
+		FakeDb.peopleTable.put(FakeDb.personId, new Person(FakeDb.personId, 45.665055, 12.927533, "Michele", "marco@bellini.it", "3381379567"));
 		builder.append("created person "+FakeDb.peopleTable.get(FakeDb.personId)+"<br/>");
 		// crea un device associata alla persona
 		FakeDb.deviceTab.put(FakeDb.deviceId, new Device(FakeDb.deviceId, 45.665055, 12.927533, FakeDb.personId));
